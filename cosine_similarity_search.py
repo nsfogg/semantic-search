@@ -6,6 +6,8 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
+import time
+import joblib
 
 
 # Load data
@@ -19,6 +21,7 @@ model = SentenceTransformer("all-MiniLM-L6-v2")  # Fast and memory-efficient mod
 
 embeddings = model.encode(
     df['synopsis'].tolist(),
+    batch_size=64,
     show_progress_bar=True,
     convert_to_numpy=True,
     normalize_embeddings=True
@@ -33,7 +36,7 @@ def search(query, top_k=5):
     similarities = cosine_similarity(query_vec, embeddings)[0]
 
     # Get top k results
-    top_k_indices = np.argsort(similarities)[-top_k:][::-1]
+    top_k_indices = np.argsort(similarities)[::-1][:top_k]
 
     results = df.iloc[top_k_indices][['title', 'genres', 'score', 'synopsis']].copy()
     results['similarity'] = similarities[top_k_indices]
@@ -41,4 +44,11 @@ def search(query, top_k=5):
     return results
 
 print("Testing search function...")
-print(f"Query: 'A story about humans fighting gods':\n{search('A story about humans fighting gods')}")
+start = time.time()
+res = search("A story about humans fighting gods")
+end = time.time()
+print(f"Query: 'A story about humans fighting gods':\n{res}\nTime taken: {end - start:.4f} seconds")
+
+# Save model & embeddings
+joblib.dump(model, "models/sbert_model.pkl")
+np.save("data/clean/embeddings.npy", embeddings)
