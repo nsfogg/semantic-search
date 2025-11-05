@@ -103,15 +103,15 @@ prompt = "Fantasy focused on adventure and growth"
 
 print("Testing search function...")
 start = time.time()
-res = hybrid_search(prompt)
+res = search(prompt)
 end = time.time()
 print(f"Query: '{prompt}':\n{res}\nTime taken: {end - start:.4f} seconds")
 
-start_v2 = time.time()
-improved_prompt = improve_query(prompt)
-res_v2 = hybrid_search(improved_prompt)
-end_v2 = time.time()
-print(f"Improved Query: '{improved_prompt}':\n{res_v2}\nTime taken: {end_v2 - start_v2:.4f} seconds")
+# start_v2 = time.time()
+# improved_prompt = improve_query(prompt)
+# res_v2 = hybrid_search(improved_prompt)
+# end_v2 = time.time()
+# print(f"Improved Query: '{improved_prompt}':\n{res_v2}\nTime taken: {end_v2 - start_v2:.4f} seconds")
 
 # Save model & embeddings
 # joblib.dump(model, "models/sbert_model.pkl")
