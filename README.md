@@ -11,6 +11,8 @@ Users can type natural-language queries like:
 
 The system understands meaning (not just keywords) and retrieves the most relevant shows using transformer embeddings and vector search.
 
+The project includes a **web-based frontend** for users to interact with the search system, powered by Flask and hosted locally or in the cloud.
+
 ---
 
 ## 🧭 Project Goals
@@ -18,7 +20,7 @@ The system understands meaning (not just keywords) and retrieves the most releva
   - Data ingestion and cleaning
   - Text embeddings (Sentence-BERT)
   - Vector similarity search (FAISS)
-  - FastAPI service for search
+  - Flask-based web frontend for search
   - Docker + Cloud deployment
   - Experiment tracking and monitoring (W&B / MLflow)
 - Produce measurable metrics:
@@ -52,52 +54,6 @@ anime-semantic-search/
 ├── README.md
 └── LICENSE
 ```
-
----
-
-## 🧱 Week 1: Data Ingestion & Schema
-### Dataset
-Data sourced from [Kaggle Anime Dataset](https://www.kaggle.com/datasets) containing:
-- `title` — unique anime name  
-- `synopsis` — plot summary text  
-- `genres` — comma-separated list of tags  
-- `rating` — numeric user rating  
-
-### Cleaning Steps
-1. Rename columns to standardized names.
-2. Drop rows missing `title` or `synopsis`.
-3. Convert `genres` into list format (`["Action", "Drama"]`).
-4. Deduplicate entries by title.
-5. Export unified dataset to `data/clean/clean_anime.json`.
-
-Example record:
-```json
-{
-  "anime_id": 101,
-  "title": "Attack on Titan",
-  "synopsis": "After his hometown is destroyed...",
-  "genres": ["Action", "Drama", "Fantasy"],
-  "rating": 8.9
-}
-```
-
-### Run the ingestion script
-```bash
-python src/ingest.py
-```
-**Output:**
-```
-Saved 12,543 cleaned anime records → data/clean/clean_anime.json
-```
-
----
-
-## ⚙️ Next Steps
-| Phase | Description | Deliverable |
-|-------|--------------|-------------|
-| Week 2 | Convert synopses to vector embeddings using Sentence-BERT | `embeddings.npy` |
-| Week 3 | Build FAISS index for fast similarity search | `faiss.index` |
-| Week 4 | Expose `/search` API via FastAPI | Local demo |
 
 ---
 
@@ -139,13 +95,55 @@ curl "http://localhost:8000/search?q=anime about samurai fighting gods&k=5"
 
 ---
 
-## 🧠 Credits & Inspiration
-Data © respective Kaggle contributors and MyAnimeList community.  
-Project inspired by modern vector-search systems used by Google, Spotify, and Netflix.
+## 🛠️ Features
+### 🔍 Semantic Search
+- **Natural Language Queries**: Users can type queries like "anime about space battles" or "romantic comedies with a twist."
+- **Transformer-Based Embeddings**: Uses `Sentence-BERT` to generate embeddings for:
+  - **Synopsis**: The plot summary of the anime.
+  - **Genres**: The genre tags associated with the anime.
+  - **Reviews**: User reviews for the anime.
+
+### ⚖️ Weighted Search
+- Combines embeddings for `synopsis`, `genres`, and `reviews` using customizable weights:
+  - Example: `0.5 * synopsis + 0.3 * genres + 0.2 * reviews`
+- Allows fine-tuning of search relevance based on user preferences.
+
+### 🌐 Web Frontend
+- **Flask-Based Web App**: A simple and intuitive interface for users to interact with the search system.
+- **Dynamic Results**: Displays the top search results with titles, genres, and synopses.
 
 ---
 
-## 📅 Status
-**Current phase:** Week 1 — Data ingestion and schema design.  
-**Next:** Generate embeddings for semantic search.
+## 🚀 How to Run the Project
+### 1. Clone the Repository
+```bash
+git clone https://github.com/nsfogg/semantic-search.git
+cd semantic-search
+```
 
+### 2. Install Dependencies
+Install required dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Set Up Environment Variables
+Create a .env file in the root directory with the following variables:
+```json
+CLEAN_DATA_PATH=data/clean/anime.parquet
+SNYOPSIS_EMBEDDINGS_PATH=embeddings/synopsis.npy
+GENRES_EMBEDDINGS_PATH=embeddings/genres.npy
+REVIEWS_EMBEDDINGS_PATH=embeddings/reviews.npy
+```
+
+### 4. Generate Embeddings
+Run the embedding_encoder.py script to generate embeddings
+
+### 5. Start the Web App
+Run the Flask app
+
+---
+
+## 🧠 Credits & Inspiration
+Data © respective Kaggle contributors and MyAnimeList community.  
+Project inspired by modern vector-search systems used by Google, Spotify, and Netflix.
