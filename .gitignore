@@ -1,3 +1,6 @@
 .env
 semantic-search/
 venv/
+data/
+
+data/clean/reviews.parquet
