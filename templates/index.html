@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Search</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Semantic Search</h1>
+        <form id="search-form">
+            <input type="text" id="query" placeholder="Enter your search query..." required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('search-form');
+        const resultsDiv = document.getElementById('results');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('query').value;
+
+            resultsDiv.innerHTML = '<p>Loading...</p>';
+
+            const response = await fetch('/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query, weights: [0.4, 0.3, 0.3], top_k: 1000 })
+            });
+
+            const results = await response.json();
+            resultsDiv.innerHTML = results.map(result => `
+                <div class="result">
+                    <h2>${result.title}</h2>
+                    <p><strong>Genres:</strong> ${result.genres}</p>
+                    <p>${result.synopsis}</p>
+                </div>
+            `).join('');
+        });
+    </script>
+</body>
+</html>
